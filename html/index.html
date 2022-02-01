@@ -17,7 +17,7 @@
     dojoConfig = {
       packages: [{
         name: "utils",
-        location: locationPath + "/html/utils"
+        location: locationPath + "/utils"
       }],
       async: true
     };
@@ -55,7 +55,7 @@
       });
 
       const extremesLayer = new GeoJSONLayer({
-        url: "extreme-points.geojson",
+        url: "./html/extreme-points.geojson",
         elevationInfo: {
           mode: "relative-to-ground",
           offset: /*offset*/ 400000,  // Offset in meters by default
@@ -211,7 +211,7 @@
             {
               type: "object",
               resource: {
-                href: "./sphere/scene.gltf"
+                href: "./html/sphere/scene.gltf"
               },
               width: 2 * R
             }
@@ -226,7 +226,7 @@
       }), {
         size: 2 * (R + offset),
         material: {
-          colorTexture: './clouds.png',
+          colorTexture: './html/clouds.png',
           doubleSided: false
         },
         densificationFactor: 4
