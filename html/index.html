@@ -55,7 +55,7 @@
       });
 
       const extremesLayer = new GeoJSONLayer({
-        url: "extreme-points.geojson",
+        url: "./extreme-points.geojson",
         elevationInfo: {
           mode: "relative-to-ground",
           offset: /*offset*/ 400000,  // Offset in meters by default
@@ -226,7 +226,7 @@
       }), {
         size: 2 * (R + offset),
         material: {
-          colorTexture: 'clouds.png',
+          colorTexture: './clouds.png',
           doubleSided: false
         },
         densificationFactor: 4
