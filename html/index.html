@@ -11,6 +11,39 @@
   <link rel="icon" href="favicon.ico" />
   <link rel="stylesheet" href="https://js.arcgis.com/4.12/esri/themes/light/main.css" />
   <link rel="stylesheet" href="style.css" />
+  <script type="text/javascript" charset="utf-8" src="https://js.arcgis.com/4.22/esri/views/SceneView.js"></script>
+  <script type="text/javascript" charset="utf-8" src="https://js.arcgis.com/4.22/esri/layers/TileLayer.js"></script>
+  <script type="text/javascript" charset="utf-8" src="https://js.arcgis.com/4.22/esri/layers/GeoJSONLayer.js"></script>
+  <script type="text/javascript" charset="utf-8" src="/the-globe-of-extremes/utils/ExaggeratedElevationLayer.js"></script>
+  <script type="text/javascript" charset="utf-8" src="https://js.arcgis.com/4.22/esri/geometry/Mesh.js"></script>
+  <script type="text/javascript" charset="utf-8" src="https://js.arcgis.com/4.22/esri/geometry/support/axisAngleDegrees.js"></script>
+  <script type="text/javascript" charset="utf-8" src="https://js.arcgis.com/4.22/esri/geometry/support/MeshComponent.js"></script>
+  <script type="text/javascript" charset="utf-8" src="https://js.arcgis.com/4.22/esri/geometry/support/MeshTransform.js"></script>
+  <script type="text/javascript" charset="utf-8" src="https://js.arcgis.com/4.22/esri/geometry/support/MeshVertexAttributes.js"></script>
+  <script type="text/javascript" charset="utf-8" src="https://js.arcgis.com/4.22/esri/geometry/support/triangulationUtils.js"></script>
+  <script type="text/javascript" charset="utf-8" src="https://js.arcgis.com/4.22/esri/geometry/support/meshUtils/centerAt.js"></script>
+  <script type="text/javascript" charset="utf-8" src="https://js.arcgis.com/4.22/esri/geometry/support/meshUtils/loadExternal.js"></script>
+  <script type="text/javascript" charset="utf-8" src="https://js.arcgis.com/4.22/esri/geometry/support/meshUtils/offset.js"></script>
+  <script type="text/javascript" charset="utf-8" src="https://js.arcgis.com/4.22/esri/geometry/support/meshUtils/primitives.js"></script>
+  <script type="text/javascript" charset="utf-8" src="https://js.arcgis.com/4.22/esri/geometry/support/meshUtils/rotate.js"></script>
+  <script type="text/javascript" charset="utf-8" src="https://js.arcgis.com/4.22/esri/geometry/support/meshUtils/scale.js"></script>
+  <script type="text/javascript" charset="utf-8" src="https://js.arcgis.com/4.22/esri/layers/ElevationLayer.js"></script>
+  <script type="text/javascript" charset="utf-8" src="https://js.arcgis.com/4.22/esri/layers/BaseElevationLayer.js"></script>
+  <script type="text/javascript" charset="utf-8" src="https://js.arcgis.com/4.22/esri/chunks/quat.js"></script>
+  <script type="text/javascript" charset="utf-8" src="https://js.arcgis.com/4.22/esri/chunks/quatf64.js"></script>
+  <script type="text/javascript" charset="utf-8" src="https://js.arcgis.com/4.22/esri/geometry/support/meshUtils/geographicUtils.js"></script>
+  <script type="text/javascript" charset="utf-8" src="https://js.arcgis.com/4.22/esri/geometry/support/meshUtils/georeference.js"></script>
+  <script type="text/javascript" charset="utf-8" src="https://js.arcgis.com/4.22/esri/views/3d/layers/TileLayerView3D.js"></script>
+  <script type="text/javascript" charset="utf-8" src="https://js.arcgis.com/4.22/esri/views/3d/layers/GeoJSONLayerView3D.js"></script>
+  <script type="text/javascript" charset="utf-8" src="https://js.arcgis.com/4.22/esri/views/layers/TileLayerView.js"></script>
+  <script type="text/javascript" charset="utf-8" src="https://js.arcgis.com/4.22/esri/views/support/drapedUtils.js"></script>
+  <script type="text/javascript" charset="utf-8" src="https://js.arcgis.com/4.22/esri/renderers/support/clickToleranceUtils.js"></script>
+  <script type="text/javascript" charset="utf-8" src="https://js.arcgis.com/4.22/esri/views/3d/layers/GraphicsView3D.js"></script>
+  <script type="text/javascript" charset="utf-8" src="https://js.arcgis.com/4.22/esri/layers/support/ElevationQuery.js"></script>
+  <script type="text/javascript" charset="utf-8" src="https://js.arcgis.com/4.22/esri/views/3d/webgl-engine/lib/SmaaRenderPassData.js"></script>
+  <script type="text/javascript" charset="utf-8" src="https://js.arcgis.com/4.22/esri/views/3d/layers/graphics/Graphics3DGraphicLikeLayerView.js"></script>
+  <script type="text/javascript" charset="utf-8" src="https://js.arcgis.com/4.22/esri/views/layers/GraphicsView.js"></script>
+  <script type="text/javascript" charset="utf-8" src="https://js.arcgis.com/4.22/esri/layers/support/ElevationTile.js"></script>
 
   <script>
     const locationPath = location.pathname.replace(/\/[^\/]+$/, "");
