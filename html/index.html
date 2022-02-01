@@ -5,23 +5,28 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="initial-scale=1" />
   <title>OpenCortex.ai</title>
-  <link rel="shortcut icon" href="/favicon.ico" />
-  <link rel="icon" type="image/vnd.microsoft.icon" href="/favicon.ico">
-  <link rel="icon" type="image/x-icon" href="/favicon.ico">
-  <link rel="icon" href="/favicon.ico" />
+  <link rel="shortcut icon" href="favicon.ico" />
+  <link rel="icon" type="image/vnd.microsoft.icon" href="favicon.ico">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" href="favicon.ico" />
   <link rel="stylesheet" href="https://js.arcgis.com/4.12/esri/themes/light/main.css" />
-  <link rel="stylesheet" href="./style.css" />
+  <link rel="stylesheet" href="style.css" />
 
   <script>
     const locationPath = location.pathname.replace(/\/[^\/]+$/, "");
     dojoConfig = {
       packages: [{
         name: "utils",
-        location: locationPath + "/utils"
+        location: locationPath
       }],
       async: true
     };
   </script>
+
+  <!-- Above, location (locationPath + ...) "/utils" was originally without the slash -->
+  <!-- That works locally, however "/utils" is required once the utils folder is inside "htmL" folder -->
+  <!-- In WP version, progress stopped at: location: href="https://opencortex.ai/wp-content/uploads/2022/01/" -->
+
 
   <script src="https://js.arcgis.com/4.12/"></script>
   <script>
@@ -55,7 +60,8 @@
       });
 
       const extremesLayer = new GeoJSONLayer({
-        url: "./extreme-points.geojson",
+        url: "extreme-points.geojson", // without DOT and WITH slash, the ORANGE layers won't load
+         // without DOT and NO slash, the ORANGE layers DO load
         elevationInfo: {
           mode: "relative-to-ground",
           offset: /*offset*/ 400000,  // Offset in meters by default
@@ -211,7 +217,7 @@
             {
               type: "object",
               resource: {
-                href: "./sphere/scene.gltf"
+                href: "scene.gltf"
               },
               width: 2 * R
             }
@@ -226,7 +232,7 @@
       }), {
         size: 2 * (R + offset),
         material: {
-          colorTexture: './clouds.png',
+          colorTexture: 'clouds.png',
           doubleSided: false
         },
         densificationFactor: 4
