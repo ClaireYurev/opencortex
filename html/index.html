@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html  lang="en-CA"> 
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="initial-scale=1" />
+  <title>OpenCortex.ai</title>
+  <link rel="shortcut icon" href="/favicon.ico" />
+  <link rel="icon" type="image/vnd.microsoft.icon" href="/favicon.ico">
+  <link rel="icon" type="image/x-icon" href="/favicon.ico">
+  <link rel="icon" href="/favicon.ico" />
+  <link rel="stylesheet" href="https://js.arcgis.com/4.12/esri/themes/light/main.css" />
+  <link rel="stylesheet" href="./style.css" />
+
+  <script>
+    const locationPath = location.pathname.replace(/\/[^\/]+$/, "");
+    dojoConfig = {
+      packages: [{
+        name: "utils",
+        location: locationPath + "/utils"
+      }],
+      async: true
+    };
+  </script>
+
+  <script src="https://js.arcgis.com/4.12/"></script>
+  <script>
+    require([
+      "esri/Map",
+      "esri/views/SceneView",
+      "esri/layers/TileLayer",
+      "esri/layers/GeoJSONLayer",
+      "esri/Basemap",
+      "utils/ExaggeratedElevationLayer",
+      "esri/Graphic",
+      "esri/geometry/Point",
+      "esri/geometry/Mesh",
+      "esri/core/watchUtils"
+    ], function (Map, SceneView, TileLayer, GeoJSONLayer, Basemap, ExaggeratedElevationLayer, Graphic, Point, Mesh, watchUtils) {
+
+  
+       const R = 6358137;   // approximate radius of the Earth in m
+      const offset = 300000;   // offset from the ground used for the clouds
+
+      const basemap = new Basemap({
+        baseLayers: [
+          new TileLayer({
+            url: "https://tiles.arcgis.com/tiles/nGt4QxSblgDfeJn9/arcgis/rest/services/terrain_with_heavy_bathymetry/MapServer"
+          })
+        ]
+      });
+
+      const map = new Map({
+        basemap: basemap
+      });
+
+      const extremesLayer = new GeoJSONLayer({
+        url: "extreme-points.geojson",
+        elevationInfo: {
+          mode: "relative-to-ground",
+          offset: /*offset*/ 400000,  // Offset in meters by default
+        
+        },
+        
+        renderer: {
+          type: "simple",
+          symbol: {
+            type: "polygon-3d",  // Autocasts as new PointSymbol3D()
+            symbolLayers: [{
+              type: "fill",
+              material: { color: [255, 255, 255, 0.1] },
+              outline: { color: [255, 127, 0, 1], size: 3 },
+              castShadows: false,
+            }],
+          }
+        },
+        popupTemplate: {
+          title: "{name}",
+          content: `
+            <div class="popupImage">
+              <img src="{imageUrl}" alt="{imageCaption}"/>
+            </div>
+            <div class="popupImageCaption">{imageCaption}</div>
+            <div class="popupDescription">
+              <p class="info">
+                <span class="esri-icon-favorites"></span> {type}
+              </p>
+              <p class="info">
+                <span class="esri-icon-map-pin"></span> {location}
+              </p>
+              <p class="info">
+                <span class="esri-icon-documentation"></span> {facts}
+              </p>
+            </div>
+            <div class="popupCredits">
+              Sources: <a href="{sourceUrl}" target="_blank">{source}</a> released under <a href="{sourceCopyrightUrl}">{sourceCopyright}</a>, <a href="{imageCopyrightUrl}" target="_blank">{imageCopyright}</a>.
+            </div>
+          `
+        }
+        
+      });
+
+      const view = new SceneView({
+        container: "viewDiv",
+        map: map,
+        alphaCompositingEnabled: true,
+        qualityProfile: "high",
+        camera: {
+          position: [-55.03975781, 14.94826384, 22921223.30821],
+          heading: 2.03,
+          tilt: 0.13
+        },
+        environment: {
+          background: {
+            type: "color",
+            /*color: [42, 64, 84, 1]*/   // Original color scheme - deprecated
+            color: [0, 22, 63, 0]
+          },
+          starsEnabled: true,
+          atmosphereEnabled: false,
+          lighting: {
+            directShadowsEnabled: false,
+            date: "Mon Jun 21 2021 19:18:47 GMT+0200 (Central European Summer Time)"
+          }
+        },
+        constraints: {
+          altitude: {
+            min: 10000000,
+            max: 25000000
+          }
+        },
+        popup: {
+          dockEnabled: true,
+          dockOptions: {
+            position: "top-right",
+            breakpoint: false,
+            buttonEnabled: false
+          },
+          collapseEnabled: false,
+          title: "{NAME}",
+          content: `
+            <div class="popupImage">
+              <img src="{imageUrl}" alt="{imageCaption}"/>
+            </div>
+            <div class="popupImageCaption">{imageCaption}</div>
+            <div class="popupDescription">
+              <p class="info">
+                <span class="esri-icon-favorites"></span> {type}
+              </p>
+              <p class="info">
+                <span class="esri-icon-map-pin"></span> {location}
+              </p>
+              <p class="info">
+                <span class="esri-icon-documentation"></span> {facts}
+              </p>
+            </div>
+            <div class="popupCredits">
+              Sources: <a href="{sourceUrl}" target="_blank">{source}</a> released under <a href="{sourceCopyrightUrl}">{sourceCopyright}</a>, <a href="{imageCopyrightUrl}" target="_blank">{imageCopyright}</a>.
+            </div>
+          `
+        },
+        highlightOptions: {
+          color: [255, 127, 0, 1],
+          fill: [1, 1, 1, 1],
+          haloOpacity: 0.75,
+          fillOpacity: 0.0
+        }
+      });
+
+      var highlightHover;
+
+      
+      map.layers.add(extremesLayer);
+
+      view.on("pointer-move",  (event) => {
+          view.hitTest(event).then((response) => {
+            if (highlightHover) {
+              highlightHover.remove();
+              view.popup.close();
+            }
+            if (response.results.length) {
+              
+              var graphic = response.results[0].graphic;
+
+              view.whenLayerView(graphic.layer).then((layerView) => {
+                highlightHover = layerView.highlight(graphic);
+                view.popup.open();
+                
+              });
+            }
+          });
+      });
+
+      /*view.ui.empty("top-left");*/
+      /*view.ui.empty("top-left");  DELETE ME*/
+
+      map.ground.layers = [new ExaggeratedElevationLayer({
+        exaggerationBathymetry: 40,
+        exaggerationTopography: 10
+      })];
+
+      const origin = new Point({
+        x: 0, y: -90, z: -(2 * R)
+      });
+
+      const oceanSurface = new Graphic({
+        geometry: origin,
+        symbol: {
+          type: "point-3d",
+          symbolLayers: [
+            {
+              type: "object",
+              resource: {
+                href: "./sphere/scene.gltf"
+              },
+              width: 2 * R
+            }
+          ]
+        }
+      });
+
+      view.graphics.add(oceanSurface);
+
+      const cloudsSphere = Mesh.createSphere(new Point({
+        x: 0, y: -90, z: -(2 * R + offset)
+      }), {
+        size: 2 * (R + offset),
+        material: {
+          colorTexture: './clouds.png',
+          doubleSided: false
+        },
+        densificationFactor: 4
+      });
+
+      cloudsSphere.components[0].shading = "flat";
+
+      const clouds = new Graphic({
+        geometry: cloudsSphere,
+        symbol: {
+          type: "mesh-3d",
+          symbolLayers: [{ type: "fill" }]
+        }
+      });
+
+      view.graphics.add(clouds);
+
+      document.getElementById("close-about").addEventListener("click", closeMenu);
+
+      document.getElementById("start-globe").addEventListener("click", function () {
+        closeMenu();
+        view.when(function () {
+          watchUtils.whenFalseOnce(view, "updating", rotate);
+        });
+      });
+
+      document.getElementById("container").addEventListener("click", function (e) {
+        if (e.target.id === "container") {
+          closeMenu();
+          view.when(function () {
+            watchUtils.whenFalseOnce(view, "updating", rotate);
+          });
+        }
+      });
+
+      function closeMenu() {
+        document.getElementById("container").style.display = "none";
+        view.container.style.filter = "blur(0px)";
+      }
+
+      let intro = true;
+      document.getElementById("about").addEventListener("click", function () {
+        document.getElementById("container").style.display = "flex";
+        view.container.style.filter = "blur(10px)";
+        if (intro) {
+          document.getElementById("show-about").classList.remove("hidden");
+          document.getElementById("show-intro").classList.add("hidden");
+          intro = false; 
+        }
+      });
+
+      view.ui.add("about", "top-right");
+
+      function rotate() {
+        if (!view.interacting) {
+          const camera = view.camera.clone();
+          camera.position.longitude -= 0.4;
+          view.goTo(camera, { animate: true });
+          requestAnimationFrame(rotate);
+        }
+      }
+    });
+  </script>
+</head>
+
+<body>
+  <div id="viewDiv">
+    <div id="about">USE OF SOCIAL MEDIA
+FOR BRAND RESEARCH</div>
+  </div>
+  <div id="container">
+    <div id="introDiv">
+      <h1>The globe of brand research</h1>
+      <div id="show-intro">
+        <p> Which countries reliably use social media for brand research?
+          How many people use social media for brand research? Click on the highlighted areas to find out!
+        </p>
+        <button id="start-globe">Go to globe</button>
+      </div>
+      <div id="show-about" class="hidden">
+        <button id="close-about" class="esri-icon-close"></button>
+        <p>This 3D Globe was created by <a href="https://github.com/ClaireYurev" target="_blank">Claire</a> after getting
+          inspired by <a href="https://github.com/home"
+            target="_blank">Github’s own awesome globe</a> and <a href="https://www.instagram.com/p/Bt8zyI-gsqW/"
+            target="_blank">this awesome globe</a>. This globe was made using <a
+            href="https://developers.arcgis.com/javascript/" target="_blank">ArcGIS API for JavaScript</a>. I used <a
+            href="https://en.wikipedia.org/wiki/Extreme_points_of_Earth" target="_blank">this Wikipedia article</a> to
+          get a list of extreme points on Earth, <a
+            href="https://sketchfab.com/3d-models/sphere-b31b12ffa93a40f48c9d991b6f168f4d" target="_blank">this 3D
+            sphere model</a> for the ocean surface and this <a href="https://visibleearth.nasa.gov/view.php?id=57747" target="_blank">cloud image</a> from NASA.
+            The basemap was created and published in <a href="https://pro.arcgis.com/"
+            target="_blank">ArcGIS Pro</a>.</p>
+        <p>For the curious coders, here is the <a href="https://github.com/ClaireYurev/opencortex" target="_blank">Github repository</a>.</p>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
